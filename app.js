@@ -1,12 +1,7 @@
 'use strict';
 
-const Sequelize = require('sequelize');
+const { sequelize } = require('./models');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: 'fsjstd-restapi.db',
-  logging: console.log
-});
 
 // load modules
 const express = require('express');
@@ -34,6 +29,9 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+// Add routes.
+//app.use('/api', routes);
 
 // Send 404 if no other route matched
 app.use((req, res) => {
