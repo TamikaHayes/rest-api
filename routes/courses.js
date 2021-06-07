@@ -10,13 +10,33 @@
  const express = require('express');
  const router = express.Router();
  const Course = require('../models').Course;
+
+ /* Handler function to wrap each route. */
+function asyncHandler(cb){
+    return async (req, res, next) => {
+      try {
+        await cb(req, res, next)
+      } catch(error){
+        //Forward error to the global error handler
+        next(error);
+      }
+    }
+  }
  
  
  /* GET courses listing -- returns all courses, including User that owns each course. */
- router.get('/', asyncHandler(async(req, res) => {
+ router.get('/courses', asyncHandler(async(req, res) => {
    const courses = await Course.findAll();
-   //res.render("books/index", { books, title: "Samwell Library" });
+    res.json(courses);
+    res.status(200);
  }));
+
+ /* GET individual course by id, along with the User that owns that specific course.*/
+ router.get('/courses/:id', asyncHandler(async(req, res) => {
+    const course = await Course.findByPk(req.params.id);
+     res.json(course);
+     res.status(200);
+  }));
  
  
 //  /* "Create a new book" -- add details about newly acquired books in "Create Book" form. */
