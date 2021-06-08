@@ -58,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
       set(val) {
           if ( val === this.password ) {
             const hashedPassword = bcrypt.hashSync(val, 10);
-            this.setDataValue('confirmedPassword', hashedPassword);
+            this.setDataValue('password', hashedPassword);
           }
         },
       validate: {
@@ -69,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'Please provide a password'
         }
       }
-  },
+    },
   },  { sequelize });
 
 
