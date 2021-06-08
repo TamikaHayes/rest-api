@@ -41,7 +41,7 @@ function asyncHandler(cb){
  
  
  /* POST course - create and add a new course to the database. */
- router.post('/courses', asyncHandler(async (req, res) => {
+ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
    let course;  
    try {
      course = await Course.create(req.body);
