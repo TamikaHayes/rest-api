@@ -10,6 +10,7 @@
  const express = require('express');
  const router = express.Router();
  const Course = require('../models').Course;
+ const User = require('../models').User;
  const { authenticateUser } = require('../middleware/auth-user');
 
  /* Handler function to wrap each route. */
@@ -27,20 +28,44 @@ function asyncHandler(cb){
  
  /* GET courses listing -- returns all courses, including User that owns each course. */
  router.get('/courses', asyncHandler(async(req, res) => {
-   const courses = await Course.findAll();
+   const courses = await Course.findAll( {
+    include: [
+      {
+        model: User,
+        as: 'user'
+      }
+    ]
+  });
+  if(courses)
+   {
     res.json(courses);
     res.status(200);
+   } else {
+     res.status(404);
+   }
  }));
 
  /* GET individual course by id, along with the User that owns that specific course.*/
  router.get('/courses/:id', asyncHandler(async(req, res) => {
-    const course = await Course.findByPk(req.params.id);
-     res.json(course);
+    const course = await Course.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'user'
+        }
+      ]
+    });
+    if(courses)
+    {
+     res.json(courses);
      res.status(200);
+    } else {
+      res.status(404);
+    }
   }));
  
  
- /* POST course - create and add a new course to the database. */
+ /* POST course - create and add a new course to the database. */ //END
  router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
    let course;  
    try {
@@ -71,9 +96,7 @@ function asyncHandler(cb){
      }
    } catch (error) {
      // Check to see if the updated course data entered by the user is valid; if not, generate validation error message
-     if(error.name === "SequelizeValidationError") {
-       course = await Course.build(req.body);
-       course.id = req.params.id;
+     if(error.name === "SequelizeValidationError" || error.name === 'SequelizeUniqueConstraintError') {
        const errors = error.errors.map(err => err.message);
        res.status(400).json({ errors });
      } else {

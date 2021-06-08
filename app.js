@@ -1,3 +1,12 @@
+/**
+ * Treehouse FSJS Techdegree
+ * Project 9 - REST API
+ * Tamika Hayes
+ * June 6, 2021
+ * routes/courses.js
+ */
+
+
 'use strict';
 
 const { sequelize } = require('./models');
