@@ -10,6 +10,7 @@
  const express = require('express');
  const router = express.Router();
  const Course = require('../models').Course;
+ const { authenticateUser } = require('../middleware/auth-user');
 
  /* Handler function to wrap each route. */
 function asyncHandler(cb){
@@ -44,7 +45,6 @@ function asyncHandler(cb){
    let course;  
    try {
      course = await Course.create(req.body);
-     //course.id = req.params.id;
      res.status(201).location(`/courses/${course.id}`).end();
    } catch (error) {
      // Check to see if the course data entered by the user is valid; if not, generate validation error message
@@ -58,9 +58,8 @@ function asyncHandler(cb){
   }));
  
  /* PUT course - Update the details of an individual course, which is specfied by id  */
- router.put("/courses/:id", asyncHandler(async(req, res) => {
+ router.put("/courses/:id", authenticateUser, asyncHandler(async(req, res) => {
    let course;
-   //let error;
    try {
      course = await Course.findByPk(req.params.id);
      console.log(course);
@@ -69,7 +68,6 @@ function asyncHandler(cb){
        res.status(204).end(); 
      } else {
        res.status(404).end();
-       //throw new Error;
      }
    } catch (error) {
      // Check to see if the updated course data entered by the user is valid; if not, generate validation error message
@@ -85,7 +83,7 @@ function asyncHandler(cb){
  }));
  
  /* DELETE an individual course, specified by id */
- router.delete("/courses/:id", asyncHandler(async (req, res) => {
+ router.delete("/courses/:id", authenticateUser, asyncHandler(async (req, res) => {
    const course = await Course.findByPk(req.params.id);
    try {
       if (course) {
