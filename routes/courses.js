@@ -39,71 +39,69 @@ function asyncHandler(cb){
   }));
  
  
-//  /* "Create a new book" -- add details about newly acquired books in "Create Book" form. */
-//  router.get('/new', (req, res) => {
-//    res.render("books/new-book", { book: {}, title: "New Book"});
-//  });
+ /* POST course - create and add a new course to the database. */
+ router.post('/courses', asyncHandler(async (req, res) => {
+   let course;  
+   try {
+     course = await Course.create(req.body);
+     //course.id = req.params.id;
+     res.status(201).location(`/courses/${course.id}`).end();
+   } catch (error) {
+     // Check to see if the course data entered by the user is valid; if not, generate validation error message
+     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+        const errors = error.errors.map(err => err.message);
+        res.status(400).json({ errors });   
+      } else {
+        throw error;
+      }
+    }
+  }));
  
-//  /* POST newly created book entries to database. */
-//  router.post('/', asyncHandler(async (req, res) => {
-//    let book;
-//    try {
-//      book = await Book.create(req.body);
-//      res.redirect("/");
-//    } catch (error) {
-//      // Check to see if the form data entered by the user is valid; if not, re-render page with error message
-//      if(error.name === "SequelizeValidationError") {
-//        book = await Book.build(req.body);
-//        res.render("books/new-book", { book, errors: error.errors, title: "New Book" })
-//      } else {
-//        throw error;
-//      }  
-//    }
-//  }));
+ /* PUT course - Update the details of an individual course, which is specfied by id  */
+ router.put("/courses/:id", asyncHandler(async(req, res) => {
+   let course;
+   //let error;
+   try {
+     course = await Course.findByPk(req.params.id);
+     console.log(course);
+     if(course) {
+       await Course.update(req.body, { where: {id: req.params.id}});
+       res.status(204).end(); 
+     } else {
+       res.status(404).end();
+       //throw new Error;
+     }
+   } catch (error) {
+     // Check to see if the updated course data entered by the user is valid; if not, generate validation error message
+     if(error.name === "SequelizeValidationError") {
+       course = await Course.build(req.body);
+       course.id = req.params.id;
+       const errors = error.errors.map(err => err.message);
+       res.status(400).json({ errors });
+     } else {
+       throw error;
+     }
+   }
+ }));
  
-//  /* GET individual book - populate book details in the "Update Book" form. */
-//  router.get("/:id", asyncHandler(async (req, res) => {
-//    const book = await Book.findByPk(req.params.id);
-//    if(book) {
-//      res.render("books/update-book", { book, title: "Update Book" });  
-//    } else {
-//      throw error;
-//    }
-//  })); 
- 
-//  /* Update a book's details, using the "Update Book" form. */
-//  router.post("/:id/", asyncHandler(async(req, res) => {
-//    let book;
-//    try {
-//      book = await Book.findByPk(req.params.id);
-//      if(book) {
-//        await book.update(req.body);
-//        res.redirect("/"); 
-//      } else {
-//        throw error;
-//      }
-//    } catch (error) {
-//      // Check to see if the form data entered by the user is valid; if not, re-render page with error message
-//      if(error.name === "SequelizeValidationError") {
-//        book = await Book.build(req.body);
-//        book.id = req.params.id;
-//        res.render("books/update-book", { book, errors: error.errors, title: "Update Book" })
-//      } else {
-//        throw error;
-//      }
-//    }
-//  }));
- 
-//  /* Delete a book, using the "Update Book" form. (**IMPORTANT user note** This action cannot be undone!) */
-//  router.post("/:id/delete", asyncHandler(async (req, res) => {
-//    const book = await Book.findByPk(req.params.id);
-//    if (book) {
-//      await book.destroy();
-//      res.redirect("/");
-//    } else {
-//      throw error;
-//    }
-     
-//  }));
+ /* DELETE an individual course, specified by id */
+ router.delete("/courses/:id", asyncHandler(async (req, res) => {
+   const course = await Course.findByPk(req.params.id);
+   try {
+      if (course) {
+        await course.destroy();
+        res.status(204).end();
+      } else {
+        res.status(404).end();
+      }  
+   } catch (error) {
+        if(error.name === "SequelizeValidationError") {
+        const errors = error.errors.map(err => err.message);
+        res.status(400).json({ errors });
+      } else {
+        throw error;
+      }
+}
+ }));
  
  module.exports = router;

@@ -18,7 +18,7 @@
 //   if (credentials) {
 //     const user = await User.findOne({ where: {emailAddress: credentials.name} });
 //     if (user) {
-//       const authenticated = bcrypt
+//       const authenticated = bcryptjs
 //         .compareSync(credentials.pass, user.password);
 //       if (authenticated) {
 //         console.log(`Authentication successful for email address: ${user.emailAddress}`);

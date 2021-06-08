@@ -9,7 +9,6 @@ const express = require('express');
 const morgan = require('morgan');
 
 // import routes
-//const routes = require('./routes');
 const router = express.Router();
 
 // variable to enable global error logging
