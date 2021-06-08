@@ -55,9 +55,9 @@ function asyncHandler(cb){
         }
       ]
     });
-    if(courses)
+    if(course)
     {
-     res.json(courses);
+     res.json(course);
      res.status(200);
     } else {
       res.status(404);
